@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if messages %}
+{% for message in messages %}
+<script>
+    window.onload = function () {
+        M.toast({ html: '{{message}}' })
+    }
+</script>
+{% endfor %}
+{% endif %}
+<div class="row container">
+    <div class="s12">
+        <h2 class="header center">비밀번호 재설정</h2><br>
+    </div>
+    <div class="s12 center">
+        <span class="center">
+            포탈 개인정보에 등록된 메일을 입력해주세요. <br>
+        </span>
+    </div>
+</div>
+
+<div class="row container">
+    <div class="col s12 l6 offset-l3 z-depth-6 card-panel" style="padding:2.0em">
+        <div class="email-form">
+            {% csrf_token %}
+            <!--이메일-->
+            <div class="row margin">
+                <div class="input-field col s12">
+                    <i class="material-icons prefix">email</i>
+                    <label name="label_email" for="{{ form_pw.email.id_for_label }}">{{ form_pw.email.label }}</label>
+                    {{ form_pw.email }}
+                    <small class="form-text text-muted">
+                        등록하신 메일로 인증번호가 발송됩니다.
+                    </small>
+                </div>
+            </div>
+            <!--비밀번호찾기 버튼-->
+            <div id="div_find_pw" class="input-field">
+                <button id="find_pw" class="btn waves-effect waves-light col s12 teal">메일 전송</button>
+            </div>
+
+            <div style="text-align: center; margin-top: 10px; margin-bottom: -10px;">
+                <div id="loading"></div>
+            </div>
+
+            <div id="result_pw"></div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="024043a3c5519cae295c26c5-text/javascript">
+    $(document).ready(function () {
+        $('#find_pw').click(function () {
+            $('#loading').replaceWith('<div id="loading_end" class="loading"></div>')
+            var email = $("#pw_form_email").val();
+
+            $.ajax({
+                type: "POST",
+                url: "/recovery/pw/find/",
+                dataType: "json",
+                data: {
+                    'email': email,
+                    'csrfmiddlewaretoken': '{{csrf_token}}',
+                },
+                success: function (response) {
+                    $('#loading_end').remove()
+                    alert('회원님의 이메일로 인증코드를 발송하였습니다.');
+                    $('#div_find_pw').remove()
+                    $('#result_pw').replaceWith(
+                        '<div class="row margin">\
+                            <form class="form-inline" style="margin-bottom:-15px; margin-top:-10px;" onsubmit="return false;">\
+                            <div class="input-field col s12">\
+                                <i class="material-icons prefix">lock</i>\
+                                <input type="text" id="input_auth_num" class="form-control mx-sm-2" autofocus/>\
+                                <small class="form-text text-muted">\
+                                    인증번호 입력 (<span id="timeset"></span>)\
+                                </small>\
+                            </div>\
+                        </form>\
+                        </div>'+
+                        '<button type="submit" name="auth_confirm" id="id_auth_confirm" class="btn waves-effect waves-light col s12 teal">인증확인</button></div><hr>'
+                    )
+                    function countdown(elementName, minutes, seconds) {
+                        var elementName, endTime, hours, mins, msLeft, time;
+                        function twoDigits(n) {
+                            return (n <= 9 ? "0" + n : n);
+                        }
+                        function updateTimer() {
+                            msLeft = endTime - (+new Date);
+                            if (msLeft < 1000) {
+                                alert("인증시간이 초과되었습니다.");
+                                $("" + elementName).remove();
+                                cert_ok = false;
+                                certificationNum = false;
+                                location.href = "{% url 'recovery_pw' %}"
+                            } else {
+                                time = new Date(msLeft);
+                                hours = time.getUTCHours();
+                                mins = time.getUTCMinutes();
+                                $("" + elementName).html((hours ? hours + ':' + twoDigits(mins) : twoDigits(mins))
+                                    + ':' + twoDigits(time.getUTCSeconds()));
+                                setTimeout(updateTimer, time.getUTCMilliseconds() + 500);
+                            }
+                        }
+                        endTime = (+new Date) + 1000 * (60 * minutes + seconds) + 500;
+                        updateTimer();
+                    }
+                    countdown("#timeset", 5, 0);
+
+                    var email = response.result
+
+                    $(document).ready(function () {
+                        $('#id_auth_confirm').click(function () {
+                            var input_auth_num = $("#input_auth_num").val();
+
+                            $.ajax({
+                                type: "POST",
+                                url: "/recovery/pw/auth/",
+                                dataType: "json",
+                                data: {
+                                    'email': email,
+                                    'input_auth_num': input_auth_num,
+                                    'csrfmiddlewaretoken': '{{csrf_token}}',
+                                },
+                                success: function (response) {
+                                    location.href = "{% url 'recovery_pw_reset' %}";
+                                },
+                                error: function () {
+                                    if ($('#input_auth_num').val() == "") {
+                                        alert('회원님의 이메일로 전송된 인증번호를 입력해주세요.');
+                                    } else {
+                                        alert('인증번호가 일치하지 않습니다.');
+                                    }
+                                },
+                            });
+                        })
+                    })
+                },
+                error: function () {
+                    $('#loading_end').remove()
+                    if (email == "") {
+                        alert('이메일을 입력해주세요.');
+                    } else {
+                        alert('입력하신 정보가 일치하지 않거나 존재하지 않습니다.');
+                    }
+                },
+            });
+        });
+    });
+</script>
+
+{% endblock %}

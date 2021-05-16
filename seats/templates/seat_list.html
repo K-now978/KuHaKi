@@ -1,0 +1,275 @@
+{% extends 'base.html' %}
+{% block content %}
+<div id="test"></div>
+<div class="container">
+    
+    <ul id="tabs_section" class="tabs" style="margin-top:10px">
+        {% for s_n in section_names %}
+        <li class="tab col s3"><a href="#tab_{{s_n}}">{{s_n}} section</a></li>
+        {% endfor %}
+    </ul>
+    {% for s_n in section_names %}
+    <div id="tab_{{s_n}}" class="row"></div>
+    {% endfor %}
+
+    <div id="modal1" class="modal">
+        <div class="modal-content">
+            <h4>Seat reservation</h4>
+            <div style="font-size: 1.3em">
+                <span>Current Seat : </span>
+                <span id='seat_name'></span>
+            </div>
+            <div class="input-field col s12">
+                <select id="time" name="time">
+                    <option value="" disabled selected>Choose Time</option>
+                    <option value="1800">30 min</option>
+                    <option value="3600">1 hour</option>
+                    <option value="5400">1.5 hour</option>
+                    <option value="7200">2 hour</option>
+                    <option value="9000">2.5 hour</option>
+                    <option value="10800">3 hour</option>
+                </select>
+            </div>
+            <div class="input-field col s12">
+                <i class="material-icons prefix">security</i>
+                <input id="authReserve" type="number" name="authNum" placeholder="Auth Code">
+            </div>
+            <div style="font-size: 1.3em">
+                <br><br><br><br><br><br>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a id="reserve" class="btn waves-effect waves-light teal">Reserve</a>
+            <a class="modal-close btn waves-effect waves-light pink">Close</a>
+        </div>
+    </div>
+
+    <div id="modal2" class="modal">
+        <div class="modal-content">
+            <h4>Seat relocation</h4>
+            <div style="font-size: 1.3em">
+                <span>Current Seat : {{my_seat.section}}-{{my_seat.number}}</span><br>
+                <span>Selected Seat : </span>
+                <span id='selected_seat'></span>
+            </div>
+            <div style="font-size: 1.3em">
+                <br>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a id="move" class="btn waves-effect waves-light teal">Relocation</a>
+            <a class="modal-close btn waves-effect waves-light pink">Close</a>
+        </div>
+    </div>
+
+
+
+</div>
+{% endblock %}
+
+{% block script %}
+
+<script type="024043a3c5519cae295c26c5-text/javascript">
+    function make_tag(tag, kwargs) {
+        var newTag = document.createElement(tag);
+        for (var key in kwargs){
+            newTag.setAttribute(key, kwargs[key]);
+        }
+        return newTag;
+    }
+
+    let sections = {{ section_names|safe }};
+    $(document).ready(function () {
+        $('.sidenav').sidenav();
+            $('.tabs').tabs();
+            $('.modal').modal();
+            $('select').formSelect();
+
+        for (var s_n in sections){
+
+            var tmp_container = make_tag("div", {"class":"col s12 container"})
+            var section = sections[s_n];
+            for (var seat_num in section){
+                var percent = section[seat_num];
+                if (('{{my_seat.number}}'==seat_num)&&('{{my_seat.section}}'==s_n)){
+                    var div1 = make_tag("div", {"class":"col s3 m2", "style":"padding-left:0.5rem; padding-right:0.5rem"})
+                    var div2 = make_tag("div", {"class":"card blue lighten-3 hoverable waves-effect waves-light", "style":"display:block"})
+                    var div3 = make_tag("div", {"id":"sec-"+s_n+"-num-"+seat_num, "class":"card-content center-align my-seat", "style":"padding:1em"})
+                    var div4 = make_tag("div", {"class":"progress blue lighten-5"})
+                    var div5 = make_tag("div", {"class":"determinate blue", "style":"width: "+percent+"%"})
+                    var spa4 = make_tag("span", {"class":"card-title", "style":"font-size:1.5em"});
+                    spa4.innerHTML=seat_num;
+                    div4.append(div5);
+                    div3.append(div4);
+                    div3.append(spa4);
+                    div2.append(div3);
+                    div1.append(div2);
+                    tmp_container.append(div1);
+                    continue;
+                }
+                if (percent == -1){
+                }
+                else if (percent == 0){
+                    var div1 = make_tag("div", {"class":"col s3 m2", "style":"padding-left:0.5rem; padding-right:0.5rem"})
+                    var div2 = make_tag("div", {"class":"card teal lighten-3 hoverable waves-effect waves-light", "style":"display:block"})
+                    var div3 = make_tag("div", {"id":"sec-"+s_n+"-num-"+seat_num, "class":"card-content center-align av-seat", "style":"padding:1em"})
+                    var div4 = make_tag("div", {"class":"progress"})
+                    var div5 = make_tag("div", {"class":"determinate", "style":"width: "+percent+"%"})
+                    var spa4 = make_tag("span", {"class":"card-title", "style":"font-size:1.5em"});
+                    spa4.innerHTML=seat_num;
+                    div4.append(div5);
+                    div3.append(div4);
+                    div3.append(spa4);
+                    div2.append(div3);
+                    div1.append(div2);
+                    tmp_container.append(div1);
+                }
+                else{
+                    var div1 = make_tag("div", {"class":"col s3 m2", "style":"padding-left:0.5rem; padding-right:0.5rem"})
+                    var div2 = make_tag("div", {"class":"card pink lighten-4 hoverable waves-effect waves-light", "style":"display:block"})
+                    var div3 = make_tag("div", {"id":"sec-"+s_n+"-num-"+seat_num, "class":"card-content center-align unav-seat", "style":"padding:1em"})
+                    var div4 = make_tag("div", {"class":"progress pink lighten-5"})
+                    var div5 = make_tag("div", {"class":"determinate pink", "style":"width: "+percent+"%"})
+                    var spa4 = make_tag("span", {"class":"card-title", "style":"font-size:1.5em"});
+                    spa4.innerHTML=seat_num;
+                    div4.append(div5);
+                    div3.append(div4);
+                    div3.append(spa4);
+                    div2.append(div3);
+                    div1.append(div2);
+                    tmp_container.append(div1);
+                }
+            }
+
+            $("#tab_"+s_n).append(tmp_container)
+            if ("{{ user.is_authenticated }}" == 'False'){
+                $('.av-seat').each(function(){
+                    $(this).removeClass('av-seat')
+                })
+            }
+
+        }
+    });
+</script>
+{% if my_seat %}
+<script type="024043a3c5519cae295c26c5-text/javascript">
+        function post_to_url(path, params, method) {
+            method = method || "post"; // Set method to post by default, if not specified.
+            // The rest of this code assumes you are not using a library.
+            // It can be made less wordy if you use one.
+            var form = document.createElement("form");
+            form.setAttribute("method", method);
+            form.setAttribute("action", path);
+            for(var key in params) {
+                var hiddenField = document.createElement("input");
+                hiddenField.setAttribute("type", "hidden");
+                hiddenField.setAttribute("name", key);
+                hiddenField.setAttribute("value", params[key]);
+                form.appendChild(hiddenField);
+            }
+            document.body.appendChild(form);
+            form.submit();
+        }
+        function fromLetters(str) {
+            "use strict";
+            var out = 0, len = str.length, pos = len;
+            while (--pos > -1) {
+                out += (str.charCodeAt(pos) - 64) * Math.pow(26, len - 1 - pos);
+            }
+            return out-1;
+        }
+        $(document).ready(function () {
+            $('.sidenav').sidenav();
+            $('.tabs').tabs();
+            $('.modal').modal();
+            $('select').formSelect();
+            
+            
+            
+
+            $('.av-seat').click(function(){
+                var clickedBtnID = $(this).attr('id'); 
+                var section = clickedBtnID.split('-')[1];
+                var num = Number(clickedBtnID.split('-')[3]);
+                $('#selected_seat').text(section+'-'+(num));
+                var instance = $('#modal2').modal('open');
+            });
+            $('#move').click( function(){                
+                var seat_name = $('#selected_seat').html();
+                var section = seat_name.split('-')[0];
+                var number = Number(seat_name.split('-')[1]);
+                
+                post_to_url("moveseat/",{'section':section, 'number':number},'get')
+            });
+            
+        });
+    </script>
+
+{% else %}
+<script type="024043a3c5519cae295c26c5-text/javascript">
+            function post_to_url(path, params, method) {
+                method = method || "post"; // Set method to post by default, if not specified.
+                // The rest of this code assumes you are not using a library.
+                // It can be made less wordy if you use one.
+                var form = document.createElement("form");
+                form.setAttribute("method", method);
+                form.setAttribute("action", path);
+                for(var key in params) {
+                    var hiddenField = document.createElement("input");
+                    hiddenField.setAttribute("type", "hidden");
+                    hiddenField.setAttribute("name", key);
+                    hiddenField.setAttribute("value", params[key]);
+                    form.appendChild(hiddenField);
+                }
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            $(document).ready(function () {
+                $('.sidenav').sidenav();
+                $('.tabs').tabs();
+                $('.modal').modal();
+                $('select').formSelect();
+                
+                
+                
+                
+    
+                $('.av-seat').click(function(){
+                    var clickedBtnID = $(this).attr('id'); 
+                    var section = clickedBtnID.split('-')[1];
+                    var num = Number(clickedBtnID.split('-')[3]);
+                    $('#seat_name').text(section+'-'+(num));
+                    var instance = $('#modal1').modal('open');
+                });
+                $('#authReserve').on("keypress", function(e) {
+                    if (e.keyCode == 13) {
+                        $('#reserve').click();
+                        return false; // prevent the button click from happening
+                    }
+                });
+                $('#reserve').click( function(){
+                    if($("#time").val() == null){
+                        alert("Select Time!");
+                        return;
+                    }
+                    if($("#authReserve").val() == ''){
+                        alert("Input Auth Number!");
+                        return;
+                    }
+                    
+                    var seat_name = $('#seat_name').html();
+                    var section = seat_name.split('-')[0];
+                    var number = Number(seat_name.split('-')[1]);
+    
+                    var time = $('#time').val();
+                    var authNum = $('#authReserve').val();
+                    var url = "/reserveSeat/"+section+'/'+number+'/'+time+'/'+authNum+'/';
+                    
+                    post_to_url("reserveseat/",{'section':section, 'number':number, 'time':time, 'authNum':authNum},'get')
+                });
+
+            });
+    </script>
+{% endif %}
+{% endblock %}

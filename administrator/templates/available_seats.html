@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% block content %}
+<div id="test"></div>
+<div class="container">
+    <h3>Available seats</h3>
+    좌석의 이용가능 여부를 변경할 수 있습니다.
+    <a id="change" class="btn waves-effect waves-light teal right" style="margin-right:27px">Change Seats</a>
+    <ul id="tabs_section" class="tabs" style="margin-top:10px">
+        {% for s_n in section_names %}
+        <li class="tab col s3"><a href="#tab_{{s_n}}">{{s_n}} section</a></li>
+        {% endfor %}
+    </ul>
+    {% for s_n in section_names %}
+    <div id="tab_{{s_n}}" class="row"></div>
+    {% endfor %}
+    <div id="modal1" class="modal">
+        <div class="modal-content">
+            <h4>COVID-19</h4>
+            <div style="font-size: 1.3em">
+                <span>거리두기 좌석 설정 </span>
+                <span id='selected_seats'></span>
+            </div>
+
+            <div style="font-size: 1.3em">
+                <br><br><br><br><br><br>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a id="change_confirm" class="btn waves-effect waves-light teal">Change</a>
+            <a class="modal-close btn waves-effect waves-light pink">Close</a>
+        </div>
+    </div>
+
+
+
+
+
+</div>
+<script src="https://code.jquery.com/jquery-2.1.1.min.js" type="90246ef0cc7d4a13d2dcc0bf-text/javascript"></script>
+{% endblock %}
+
+{% block script %}
+
+<script type="024043a3c5519cae295c26c5-text/javascript">
+    function make_tag(tag, kwargs) {
+        var newTag = document.createElement(tag);
+        for (var key in kwargs){
+            newTag.setAttribute(key, kwargs[key]);
+        }
+        return newTag;
+    }
+
+    let sections = {{ section_names|safe }};
+    $(document).ready(function () {
+        for (var s_n in sections){
+
+            var tmp_container = make_tag("div", {"class":"col s12 container"})
+            var section = sections[s_n];
+            for (var seat_num in section){
+                var percent = section[seat_num];
+                
+                if (percent == -1){
+                    var div1 = make_tag("div", {"class":"col s3 m2", "style":"padding-left:0.5rem; padding-right:0.5rem"})
+                    var div2 = make_tag("div", {"class":"card grey darken-3 hoverable waves-effect waves-light", "style":"display:block"})
+                    var div3 = make_tag("div", {"id":"sec-"+s_n+"-num-"+seat_num, "class":"card-content center-align uav-seat", "style":"padding:1em"})
+                    var spa4 = make_tag("span", {"class":"card-title", "style":"font-size:1.5em"});
+                    spa4.innerHTML=seat_num;
+                    div3.append(spa4);
+                    div2.append(div3);
+                    div1.append(div2);
+                    tmp_container.append(div1);
+                }
+                else {
+                    var div1 = make_tag("div", {"class":"col s3 m2", "style":"padding-left:0.5rem; padding-right:0.5rem"})
+                    var div2 = make_tag("div", {"class":"card teal lighten-3 hoverable waves-effect waves-light", "style":"display:block"})
+                    var div3 = make_tag("div", {"id":"sec-"+s_n+"-num-"+seat_num, "class":"card-content center-align av-seat", "style":"padding:1em"})
+                    var spa4 = make_tag("span", {"class":"card-title", "style":"font-size:1.5em"});
+                    spa4.innerHTML=seat_num;
+                    div3.append(spa4);
+                    div2.append(div3);
+                    div1.append(div2);
+                    tmp_container.append(div1);
+                }
+
+            }
+
+            $("#tab_"+s_n).append(tmp_container)
+        }
+    });
+</script>
+
+<script type="024043a3c5519cae295c26c5-text/javascript">
+    $(document).ready(function () {
+        $('.tabs').tabs();
+        $('.modal').modal();
+        $('select').formSelect();
+
+
+        
+        $('#change').click(function(){
+            $('#selected_seats')
+            var instance = $('#modal1').modal('open');
+        })
+        $('#change_confirm').click(function(){
+            var av_seats = [];
+            var uav_seats = [];
+            $('.av-seat').each(function(){
+                var name = $(this).attr('id');
+                av_seats.push(name);
+            })
+
+
+            $('.uav-seat').each(function(){
+                var name = $(this).attr('id');
+                uav_seats.push(name);
+            })
+            
+            $.ajax({
+                type: "POST",
+                url: "{% url 'available_seats_change' %}",
+                dataType: "json",
+                data: {
+                    'av_seats': JSON.stringify(av_seats),
+                    'uav_seats': JSON.stringify(uav_seats),
+                    'csrfmiddlewaretoken': '{{csrf_token}}',
+                },
+                success: function (response) {
+                    var num_change = response.result
+                    alert(num_change+'개의 좌석이 변경되었습니다.');
+                    location.href = "{% url 'available_seats' %}"
+                    },
+                error: function () {
+                    alert("좌석 변경 실패.")
+                },
+            });
+        })
+        
+        $('.card').click(function(){
+            if ($(this).children().hasClass("av-seat")){
+                $(this).removeClass("teal lighten-3")
+                $(this).addClass("grey darken-3")
+                $(this).children().removeClass("av-seat")
+                $(this).children().addClass("uav-seat")
+            }
+            else if ($(this).children().hasClass("uav-seat")){
+                $(this).removeClass("grey darken-3")
+                $(this).addClass("teal lighten-3")
+                $(this).children().removeClass("uav-seat")
+                $(this).children().addClass("av-seat")
+            }
+        })
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,146 @@
+<head>
+  {% load static %}
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-142062887-1"
+    type="f488f1dda95381a5c25e1bc3-text/javascript"></script>
+  <script type="f488f1dda95381a5c25e1bc3-text/javascript">
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', 'UA-142062887-1');
+      </script>
+  
+  <title>KuHaKi - 고려대학교 하나과학관 키오스크</title>
+  <meta name="title" content="KuHaKi, 고려대학교 하나과학관 키오스크" />
+  <meta name="description" content="KuHaKi, 고려대학교 하나과학관 키오스크" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+  <meta name="theme-color" content="#790030">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:300&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="shortcut icon" href="{% static 'img/kuhaki.png' %}">
+
+  <style>
+    body{
+      background-repeat: no-repeat;
+      background-size: 1600px 80%;
+      background-position: center top;
+    }
+    ul{
+      list-style:none;
+    }
+    blockquote{
+      border-left: 5px solid #b71c1c
+    }
+    .tabs .tab a{
+      color: #b71c1c
+    }
+    .tabs .tab a:hover {
+      color:#b71c1c;
+    }
+    .tabs .tab a.active {
+      color:#b71c1c;
+    }
+    .tabs .indicator {
+      background-color:#b71c1c;
+    }
+  </style>
+  {% block style %}
+  {% endblock %}
+</head>
+
+<body>
+  <nav class="red darken-4" role="navigation">
+    <div id="draggable" class="nav-wrapper container">
+      <a id="logo-container" href="/" class="brand-logo">
+        <span style="font-family: 'Roboto Slab', serif;">KuHaKi</span>
+      </a>
+
+
+      {% if user.is_authenticated %}
+      <ul id="menu" class="right hide-on-med-and-down ">
+        <li><a href="/tips/">Tips</a></li>
+        <li><a href="/seats/">Seats</a></li>
+        <li><a href="/logout/">Log out</a></li>
+      </ul>
+
+      <ul id="nav-mobile" class="sidenav">
+        <li><a href="/tips/">Tips</a></li>
+        <li><a href="/seats/">Seats</a></li>
+        <li><a href="/logout/">Log out</a></li>
+      </ul>
+      {% else %}
+      <ul id="menu" class="right hide-on-med-and-down">
+        <li><a href="/tips/">Tips</a></li>
+        <li><a href="/seats/">Seats</a></li>
+        <li><a href="/">Sign in</a></li>
+        <li><a href="/signup/">Sign up</a></li>
+      </ul>
+
+      <ul id="nav-mobile" class="sidenav">
+        <li><a href="/tips/">Tips</a></li>
+        <li><a href="/seats/">Seats</a></li>
+        <li><a href="/">Sign in</a></li>
+        <li><a href="/signup/">Sign up</a></li>
+      </ul>
+      {% endif %}
+      <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+    </div>
+  </nav>
+  
+  <br>
+  {% block content %}
+  {% endblock %}
+
+  <footer class="page-footer red darken-4">
+    <div class="container">
+        <div class="row">
+            <div class="col s12">
+                <h5 class="white-text">Korea University Hana Science Hall Kiosk</h5>
+                <p class="grey-text text-lighten-4">버그, 오류 발견 시 다음 이메일로 연락해주세요.
+                    <a href="mailto:zoomin2696@gmail.com" class="__cf_email__">zoomin2696@gmail.com</a><br>
+                    버그 악용 시 제재를 받을 수 있습니다. 버그를 발견하실 경우 이메일 부탁드립니다. <br>
+                    문의사항(예 : 회원가입 시 문제가 있는 경우)은 보건과학대학 학생회 측으로 문의하시기 바랍니다.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="footer-copyright">
+        <div class="container">
+            © 2021 Copyright Injae Kim, Minseok Joo
+            <!-- <a class="grey-text text-lighten-4 right"
+                href="/cdn-cgi/l/email-protection#84f7ecedeae9e3b6b1b6b4c4e3e9e5ede8aae7ebe9">Mail me!</a> -->
+        </div>
+    </div>
+</footer>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js" type="024043a3c5519cae295c26c5-text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"
+    type="024043a3c5519cae295c26c5-text/javascript"></script>
+<script src="https://ajax.cloudflare.com/cdn-cgi/scripts/7089c43e/cloudflare-static/rocket-loader.min.js"
+    data-cf-settings="024043a3c5519cae295c26c5-|49" defer=""></script>
+<script type="024043a3c5519cae295c26c5-text/javascript">
+  (function ($) {
+      $(function () {
+          $('.sidenav').sidenav();
+          $('.modal').modal();
+          $('select').formSelect();
+
+      }); // end of document ready
+  })(jQuery); // end of jQuery name space
+  $(document).ready(function(){
+    if ("{{ user.is_staff }}"=='True'){
+      $('#nav-mobile').append('<li><a href="/manager/">Administrator Page</a></li>')
+      $('#nav-mobile').append('<li><a href="/manager/availableSeats">COVID-19</a></li>')
+      $('#nav-mobile').append('<li><a href="/manager/UserList">User List</a></li>')
+      $('#menu').append('<li><a href="/manager/">Administrator Page</a></li>')
+      $('#menu').append('<li><a href="/manager/availableSeats">COVID-19</a></li>')
+      $('#menu').append('<li><a href="/manager/UserList">User List</a></li>')
+    }
+  })
+</script>
+
+{% block script %}
+{% endblock %}
+</body>
+

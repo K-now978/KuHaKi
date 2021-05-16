@@ -1,0 +1,326 @@
+{% extends 'base.html' %}
+{% block style %}
+
+<head>
+  <style>
+    .medium-small {
+      font-size: 0.9rem;
+      margin: 0;
+      padding: 0;
+    }
+
+
+    .login-form-text {
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-size: 0.8rem;
+    }
+
+    .login-text {
+      margin-top: -6px;
+      margin-left: -6px !important;
+    }
+
+    .margin {
+      margin: 0 !important;
+    }
+
+    .pointer-events {
+      pointer-events: auto !important;
+    }
+
+    .input-field>.material-icons {
+      padding-top: 10px;
+    }
+
+    .input-field div.error {
+      position: relative;
+      top: 0rem;
+      left: 3rem;
+      font-size: 0.8rem;
+      color: #FF4081;
+      -webkit-transform: translateY(0%);
+      -ms-transform: translateY(0%);
+      -o-transform: translateY(0%);
+      transform: translateY(0%);
+    }
+  </style>
+</head>
+{% endblock %}
+{% block content %}
+{% if messages %}
+{% for message in messages %}
+<script>
+  window.onload = function () {
+    M.toast({ html: '{{message}}' })
+  }
+</script>
+{% endfor %}
+{% endif %}
+<div class="row container">
+  <div class="s12">
+    <h2 class="header center">회원가입</h2><br>
+  </div>
+  <div class="s12 center">
+    <span class="center">
+      포탈 개인정보에 등록된 메일을 사용해 가입해야 합니다. <br>
+      비밀번호는 암호화되어 보관됩니다.
+    </span>
+  </div>
+</div>
+<div class="row container">
+  <div id="signup-page" class="row">
+    <div class="col s12 l6 offset-l3 z-depth-6 card-panel" style="padding:2.0em">
+      <div>
+        <form id="signup-form" class="signup-form" method="POST">
+          <!-- <form class="login-form", method="POST" action="{% url 'signup'%}"> -->
+          {% csrf_token %}
+          <div class="row margin">
+            <div class="input-field col s12">
+              <i class="material-icons prefix">account_circle</i>
+              <input id="username" name="username" type="text" />
+              <label for="username">name</label>
+            </div>
+          </div>
+
+          <div class="row margin">
+            <div class="input-field col s12">
+              <i class="material-icons prefix">playlist_add_check</i>
+              <input id="student_id" name="student_id" type="text" style="cursor: auto;" />
+              <label for="student_id">Student number</label>
+            </div>
+          </div>
+
+          <div class="row margin">
+            <div class="input-field col s12">
+              <i class="material-icons prefix">email</i>
+              <input id="email" name="email" type="text" style="cursor: auto;" />
+              <label for="email">Email</label>
+            </div>
+          </div>
+
+          <div class="row margin">
+            <div class="input-field col s12">
+              <i class="material-icons prefix">vpn_key</i>
+              <input id="password1" name="password1" type="password" />
+              <label for="password1">Password</label>
+            </div>
+          </div>
+
+          <div class="row margin">
+            <div class="input-field col s12">
+              <i class="material-icons prefix">vpn_key</i>
+              <input id="password2" name="password2" type="password" />
+              <label for="password2">Password again</label>
+            </div>
+          </div>
+          <div id="submit_btn">
+            <div class="input-field">
+              <button type="submit" class="btn waves-effect waves-light col s12 teal">Join</button>
+            </div>
+            <div class="row">
+              <div class="input-field col s12" style="margin-bottom:-7px">
+                <p class="margin center medium-small sign-up">Already have an account? <a href="/">Login</a></p>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <!--비밀번호찾기 버튼-->
+
+      <div style="text-align: center; margin-top: 10px; margin-bottom: -10px;">
+        <div id="loading"></div>
+      </div>
+
+      <div id="email_check"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block script %}
+
+<script type="024043a3c5519cae295c26c5-text/javascript"
+  src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script type="024043a3c5519cae295c26c5-text/javascript">
+  submit = document.getElementById("submit_btn");
+
+  $.validator.addMethod("alphanumeric",
+    function (value, element) {
+      return this.optional(element)
+
+    })
+  $(".signup-form").validate({
+    rules: {
+      username: {
+        required: true,
+      },
+      email: {
+        required: true,
+        email: true
+      },
+      student_id: {
+        required: true,
+        number: true,
+        minlength: 10,
+        maxlength: 10,
+
+      },
+      password1: {
+        required: true,
+        minlength: 5,
+        maxlength: 15
+      },
+      password2: {
+        required: true,
+        equalTo: "#password1"
+      }
+    },
+    //For custom messages
+    messages: {
+      username: {
+        required: "이름을 입력해주세요.",
+      },
+      email: {
+        required: "이메일을 입력해주세요.",
+        email: "이메일 형식이 아닙니다."
+      },
+      student_id: {
+        required: "학번을 입력해주세요.",
+        number: "숫자만 입력해주세요.",
+        minlength: "10자리의 학번을 입력해주세요.",
+        maxlength: "10자리의 학번을 입력해주세요."
+      },
+      password1: {
+        required: "비밀번호를 입력해주세요.",
+        minlength: "비밀번호는 최소 5자리로 숫자와 영어 조합으로 입력해주세요.",
+        maxlength: "비밀번호는 15자리를 넘을 수 없습니다."
+      },
+      password2: {
+        equalTo: "비밀번호가 일치하지 않습니다."
+      }
+    },
+    errorElement: 'div',
+    errorPlacement: function (error, element) {
+      var placement = $(element).data('error');
+      if (placement) {
+        $(placement).append(error)
+      } else {
+        error.insertAfter(element);
+      }
+    },
+    submitHandler: function(form){
+      $('#loading').replaceWith('<div id="loading_end" class="loading"></div>')
+        var username = $("#username").val();
+        var email = $("#email").val();
+        var student_id = $("#student_id").val();
+        var password1 = $("#password1").val();
+        var password2 = $("#password2").val();
+
+        $.ajax({
+            type: "POST",
+            url: "/signup/",
+            dataType: "json",
+            data: {
+                'username': username,
+                'email': email,
+                'student_id': student_id,
+                'password1': password1,
+                'password2': password2,
+                'csrfmiddlewaretoken': '{{csrf_token}}',
+            },
+            success: function (response) {
+                var is_exist = response.is_exist
+                if (is_exist == 1){
+                  $('#loading_end').remove()
+                  alert('회원님의 이메일로 인증코드를 발송하였습니다.');
+                  $('#submit_btn').remove()
+                  $('#email_check').replaceWith(
+                      '<div class="row margin">\
+                          <form class="form-inline" style="margin-bottom:-15px; margin-top:-10px;" onsubmit="return false;">\
+                          <div class="input-field col s12">\
+                              <i class="material-icons prefix">lock</i>\
+                              <input type="text" id="input_auth_num" class="form-control mx-sm-2" autofocus/>\
+                              <small class="form-text text-muted">\
+                                  인증번호 입력 (<span id="timeset"></span>)\
+                              </small>\
+                          </div>\
+                      </form>\
+                      </div>'+
+                      '<button type="submit" name="auth_confirm" id="id_auth_confirm" class="btn waves-effect waves-light col s12 teal"><i class="fas fa-check"></i>&nbsp;&nbsp;인증확인</button></div><hr>'
+                  )
+                  function countdown(elementName, minutes, seconds) {
+                      var elementName, endTime, hours, mins, msLeft, time;
+                      function twoDigits(n) {
+                          return (n <= 9 ? "0" + n : n);
+                      }
+                      function updateTimer() {
+                          msLeft = endTime - (+new Date);
+                          if (msLeft < 1000) {
+                              alert("인증시간이 초과되었습니다.");
+                              $("" + elementName).remove();
+                              cert_ok = false;
+                              certificationNum = false;
+                              location.href = "{% url 'signup' %}"
+                          } else {
+                              time = new Date(msLeft);
+                              hours = time.getUTCHours();
+                              mins = time.getUTCMinutes();
+                              $("" + elementName).html((hours ? hours + ':' + twoDigits(mins) : twoDigits(mins))
+                                  + ':' + twoDigits(time.getUTCSeconds()));
+                              setTimeout(updateTimer, time.getUTCMilliseconds() + 500);
+                          }
+                      }
+                      endTime = (+new Date) + 1000 * (60 * minutes + seconds) + 500;
+                      updateTimer();
+                  }
+                  countdown("#timeset", 5, 0);
+
+                  var email = response.email
+
+                  $(document).ready(function () {
+                      $('#id_auth_confirm').click(function () {
+                          var input_auth_num = $("#input_auth_num").val();
+
+                          $.ajax({
+                              type: "POST",
+                              url: "/signup/auth_check/",
+                              dataType: "json",
+                              data: {
+                                  'email': email,
+                                  'input_auth_num': input_auth_num,
+                                  'password' : password1,
+                                  'csrfmiddlewaretoken': '{{csrf_token}}',
+                              },
+                              success: function (response) {
+                                  location.href = "{% url 'login' %}";
+                              },
+                              error: function () {
+                                  if ($('#input_auth_num').val() == "") {
+                                      alert('회원님의 이메일로 전송된 인증번호를 입력해주세요.');
+                                  } else {
+                                      alert('인증번호가 일치하지 않습니다.');
+                                  }
+                              },
+                          });
+                      })
+                  })
+                } else {
+                  var messages = response.messages
+                  for (var i=0; i<response.m_c ; i++){
+                    M.toast({ html: messages[i] })
+                  }
+                }
+                  
+
+            },
+            error: function () {
+              $('#loading_end').remove()
+              alert("오류")
+            },
+        });
+    }
+  });
+
+
+</script>
+{% endblock %}

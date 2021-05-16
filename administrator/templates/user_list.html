@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css"
+    href="https://cdn.datatables.net/v/dt/dt-1.10.18/r-2.2.2/sl-1.3.0/datatables.min.css" />
+<div class="container">
+    <div class="row">
+        <h3>KuHaKi Members</h3>
+        <div class="right">
+            <button id="delFromMembers" class="btn red waves-effect waves-light">Delete</button>
+        </div>
+    </div>
+
+    <table class="striped" id="example">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Snum</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in user_info %}
+            <tr>
+                <td>{{ user.student_info.student_name }}</td>
+                <td>{{ user.student_info.email }}</td>
+                <td>{{ user.student_info.student_id }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+{% block script %}
+<script type="024043a3c5519cae295c26c5-text/javascript"
+    src="https://cdn.datatables.net/v/dt/dt-1.10.18/r-2.2.2/sl-1.3.0/datatables.min.js"></script>
+<script type="024043a3c5519cae295c26c5-text/javascript">
+    (function ($) {
+        $(function () {
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                M.toast({ html: 'Mobile Selection Mode' });
+                var table = $('#example').DataTable({});
+                $('table#example').css('font-size', 'small');
+                $('#example tbody').on('click', 'tr', function () {
+                    $(this).toggleClass('selected');
+                });
+            }
+            else {
+                var table = $('#example').DataTable({
+                    select: {
+                        select: true
+                    }
+                });
+            }
+
+            $('#example_length').html($('#example_length').html().split(' entries')[0] + '</label>');
+            $('.sidenav').sidenav();
+            $('select').formSelect();
+
+
+            $('#delFromMembers').click(function () {
+                if (!confirm("삭제하시겠습니까?")) { return; }
+                var selDatas = table.rows('.selected').data();
+                var jsonData = [];
+                for (var i = 0; i < selDatas.length; i++) {
+                    jsonData.push(selDatas[i]);
+                }
+                $.ajax({
+                    type: "POST"
+                    , url: "{% url 'del_userlist' %}"
+                    , async: false
+                    , data: JSON.stringify(jsonData, null, '\t')
+                    , contentType: 'application/json;charset=UTF-8'
+                    , success: function (data) {
+                        alert(data);
+                    }
+                    , error: function (data) {
+                        alert("error");
+                    }
+                });
+                location.reload();
+            });
+        });
+    })(jQuery);
+</script>
+{% endblock %}

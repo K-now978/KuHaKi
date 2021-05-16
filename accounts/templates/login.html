@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% block style %}
+{% load static %}
+<style>
+    body{
+        background-image: url("{% static 'img/HanaHall.jpg' %}");
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+    <script>
+        window.onload = function () {
+            M.toast({html: '{{message}}'})
+        }
+    </script>
+    {% endfor %}
+{% endif %}
+<div class="row container">
+    <div class="s12">
+        <h2 class="header center" style="font-weight: 700; font-family: Georgia, 'Times New Roman', serif;font-size: 70px;">KU Hana Kiosk</h2><br>
+    </div>
+    <div class="row">
+        <a href="/seats/" class="col s12 m6 offset-m3">
+            <div class="card-panel teal lighten-1 z-depth-3">
+                <span class="card-title white-text center">
+                    <div class="center">
+                        <span style="font-size:2rem;"> Available : {{available_seats}} / {{total_seats}}</span>
+                    </div>
+                </span>
+            </div>
+        </a>
+        <!-- <div class="col s12 m5 offset-m2">
+            <div class="card-panel grey lighten-1 z-depth-3">
+                <span class="card-title white-text center">
+                    <div class="center">
+                        <i class="material-icons" style="vertical-align: sub; font-size:2rem">sentiment_very_dissatisfied</i><span
+                            style="font-size:2rem;"> Occupied : 0</span>
+                    </div>
+                </span>
+            </div>
+        </div> -->
+    </div>
+
+    {% if user.is_authenticated %}
+    <div class="card white col s12 l6 offset-l3 z-depth-3">
+        <div class="card-content">
+            <span class="card-title">{{ user.student_info.student_name }}<button
+                    onclick="if (!window.__cfRLUnblockHandlers) return false; location.href=/logout/" type="button"
+                    class="btn waves-effect waves-light pink lighten-2 float right"
+                    data-cf-modified-60b9d81fc5b4ee6c9094cdc7-="">Logout
+                    <i class="material-icons small float right"
+                        style="line-height: inherit;">exit_to_app</i></button></span>
+        </div>
+        <div class="card-action">
+            <div class="row" style="margin-bottom: auto">
+                <span class="card-title" style="font-size: 1.2rem">{{ user.email }}</a></span>
+                <span class="card-title float right" style="font-size: 1.2rem">{{ user.student_info.student_id }}</span>
+            </div>
+        </div>
+    </div>
+    
+    {% if my_seat is not none %}
+    <div class="card white col s12 l6 offset-l3 z-depth-3">
+        <div class="card-content">
+            <span class="card-title">{{my_seat.section}}-{{my_seat.number}}</span>
+            <div class="progress">
+                <div class="determinate" style="width: {{percent}}%"></div>
+            </div>
+            <span class="card-title center" style="font-size: 1.5rem; margin-bottom: auto">
+                {{start_time}} ~ {{end_time}}
+            </span>
+        </div>
+        <div class="card-action">
+            <div class="row" style="margin-bottom: auto">
+                {% if extend %}
+                <a id="sec-{{my_seat.section}}-num-{{my_seat.number}}" class="btn col s5 waves-effect waves-light modal-trigger extend" href="#modal1">Extend</a>
+                {% else %}
+                <a id="sec-{{my_seat.section}}-num-{{my_seat.number}}" class="btn col s5 waves-effect waves-light modal-trigger extend disabled" href="#modal1">Extend</a>
+                {% endif %}
+                <a class="btn col s5 pink lighten-2 offset-s2 waves-effect waves-light" href="/seats/returnseat/">Return</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="card white col s12 l6 offset-l3 z-depth-3">
+        <div class="card-content">
+            <span class="card-title">No Seat</span>
+        </div>
+        <div class="card-action">
+            <div class="row" style="margin-bottom: auto">
+                <a class="btn col s12 waves-effect waves-light" href="/seats/">Reserve a seat</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="col s12 l6 offset-l3 z-depth-3 card-panel" style="padding:1.5em">
+        <form method="POST" action="{% url 'login' %}">
+
+            {% csrf_token %}
+            <div class="input-field">
+                <i class="material-icons prefix">person_outline</i>
+                <input class="validate" id="email" type="email" name="email" , placeholder="Email">
+            </div>
+            <div class="input-field">
+                <i class="material-icons prefix">lock_outline</i>
+                <input id="password" type="password" name="password" required, placeholder="password">
+            </div>
+
+            <div class="input-field">
+                <button type="submit" class="btn waves-effect waves-light teal col s12"
+                    style="font-size: 1.2rem; height: 3rem">Login
+                    <i class="material-icons small right" style="font-size: 2rem">send</i></button>
+            </div>
+
+            <div class="row">
+                <div class="col s12">
+                    <div class="center">
+                        <a href="/signup/">Create account</a> / <a href="/recovery/pw">Forgot password?</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    <div id="modal1" class="modal">
+        <div class="modal-content">
+            <h4>Seat reservation</h4>
+            <div style="font-size: 1.3em">
+                <span>Current Seat : </span>
+                <span id='seat_name'></span>
+            </div>
+            <div class="input-field col s12">
+                <select id="time" name="time">
+                    <option value="" disabled selected>Choose Time</option>
+                    <option value="1800">30 min</option>
+                    <option value="3600">1 hour</option>
+                    <option value="5400">1.5 hour</option>
+                    <option value="7200">2 hour</option>
+                    <option value="9000">2.5 hour</option>
+                    <option value="10800">3 hour</option>
+                </select>
+            </div>
+            <div class="input-field col s12">
+                <i class="material-icons prefix">security</i>
+                <input id="authReserve" type="number" name="authNum" placeholder="Auth Code">
+            </div>
+            <div style="font-size: 1.3em">
+                <br><br><br><br><br><br>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a id="extend" class="btn waves-effect waves-light teal">Extend</a>
+            <a class="modal-close btn waves-effect waves-light pink">Close</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+<script type="024043a3c5519cae295c26c5-text/javascript">
+    function post_to_url(path, params, method) {
+        method = method || "post"; // Set method to post by default, if not specified.
+        // The rest of this code assumes you are not using a library.
+        // It can be made less wordy if you use one.
+        var form = document.createElement("form");
+        form.setAttribute("method", method);
+        form.setAttribute("action", path);
+        for(var key in params) {
+            var hiddenField = document.createElement("input");
+            hiddenField.setAttribute("type", "hidden");
+            hiddenField.setAttribute("name", key);
+            hiddenField.setAttribute("value", params[key]);
+            form.appendChild(hiddenField);
+        }
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    $(document).ready(function () {
+        $('.modal').modal();
+        $('select').formSelect();
+
+        $('.extend').click(function(){
+            var clickedBtnID = $(this).attr('id'); 
+            var section = clickedBtnID.split('-')[1];
+            var num = Number(clickedBtnID.split('-')[3]);
+            $('#seat_name').text(section+'-'+(num));
+            var instance = $('#modal1').modal('open');
+        });
+
+        $('#extend').click( function(){
+            if($("#time").val() == null){
+                alert("Select Time!");
+                return;
+            }
+            if($("#authReserve").val() == ''){
+                alert("Input Auth Number!");
+                return;
+            }
+            
+            var seat_name = $('#seat_name').html();
+            var section = seat_name.split('-')[0];
+            var number = Number(seat_name.split('-')[1]);
+
+            var time = $('#time').val();
+            var authNum = $('#authReserve').val();
+            
+            post_to_url("seats/extendseat/",{'section':section, 'number':number, 'time':time, 'authNum':authNum},'get')
+        });
+
+
+    });
+</script>
+{% endblock %}
